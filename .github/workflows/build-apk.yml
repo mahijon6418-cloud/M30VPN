@@ -18,7 +18,7 @@ jobs:
         run: |
           rm -rf buildsrc
           mkdir -p buildsrc
-          unzip -q M30VPN-v2-Persian-UI-source.zip -d buildsrc
+          unzip -q M30VPN-v4-exact-buildfix-source.zip -d buildsrc
       - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
