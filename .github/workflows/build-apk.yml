@@ -17,7 +17,7 @@ jobs:
       - name: Extract M30 VPN source
         run: |
           rm -rf buildsrc
-          mkdir buildsrc
+          mkdir -p buildsrc
           unzip -q M30VPN-GitHub-Ready.zip -d buildsrc
 
       - name: Set up JDK 17
@@ -28,8 +28,33 @@ jobs:
 
       - name: Prepare Android SDK
         run: |
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager --install \
+          export ANDROID_HOME="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          export ANDROID_SDK_ROOT="$ANDROID_HOME"
+
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> "$GITHUB_ENV"
+
+          echo "Searching for sdkmanager..."
+
+          SDKMANAGER="$(find "$ANDROID_HOME" -type f -name sdkmanager -print -quit)"
+
+          if [ -z "$SDKMANAGER" ]; then
+            echo "ERROR: sdkmanager was not found."
+            find "$ANDROID_HOME" -maxdepth 5 -type f -name "*sdkmanager*" -print || true
+            exit 1
+          fi
+
+          echo "Found sdkmanager: $SDKMANAGER"
+
+          SDK_BIN="$(dirname "$SDKMANAGER")"
+          echo "$SDK_BIN" >> "$GITHUB_PATH"
+          echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
+
+          "$SDKMANAGER" --sdk_root="$ANDROID_HOME" --version
+
+          yes | "$SDKMANAGER" --sdk_root="$ANDROID_HOME" --licenses >/dev/null || true
+
+          "$SDKMANAGER" --sdk_root="$ANDROID_HOME" --install \
             "platform-tools" \
             "platforms;android-35" \
             "build-tools;35.0.0" \
