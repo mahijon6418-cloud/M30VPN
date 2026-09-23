@@ -65,9 +65,9 @@ jobs:
           gradle-version: '8.10.2'
 
       - name: Build Debug APK
-        working-directory: buildsrc
-        run: |
-          gradle assembleDebug --no-daemon --stacktrace
+  run: |
+    cd buildsrc
+    gradle assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
